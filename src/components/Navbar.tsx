@@ -30,7 +30,7 @@ export function Navbar() {
                 <div className="hidden md:flex gap-3 items-center">
                     <button className={linkStyle} onClick={() => router.push("/")}>Home</button>
                     <button className={linkStyle} onClick={() => router.push("/recipes")}>Recipes</button>
-                    <button className={linkStyle} onClick={() => router.push("/profile")}>Profile</button>
+                    <button className={linkStyle} onClick={() => router.push("/auth/profile")}>Profile</button>
                 </div>
             </div>
 
@@ -45,7 +45,7 @@ export function Navbar() {
                         router.push("/recipes"); }}>Recipes</button>
                     <button className={`${linkStyle} w-full block text-left`} onClick={() => { 
                         setIsOpen(false);
-                        router.push("/profile"); }}>Profile</button>
+                        router.push("/auth/profile"); }}>Profile</button>
                 </div>
             )}
         </nav>
