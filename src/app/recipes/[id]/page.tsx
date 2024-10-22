@@ -98,7 +98,7 @@ export default function RecipeDetails(){
 
     //function to handle edit recipe
     const handleEdit = () => {
-        navigate.push(`/editRecipe/${id}`);
+        navigate.push(`/recipes/${id}/editRecipe`);
     }
 
     return (
