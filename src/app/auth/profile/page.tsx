@@ -1,10 +1,15 @@
 "use client"
-import { useCookies } from "react-cookie";
+//Native imports
 import { useEffect, useState } from "react";
-import { userApi } from "../../../utils/apiPaths";
-import axios from "axios";
-import chefImage from "../../../../public/assets/chef.jpg"
 import { useRouter } from "next/navigation";
+
+//Third party imports
+import { useCookies } from "react-cookie";
+import axios from "axios";
+
+//Static imports
+import { userApi } from "../../../utils/apiPaths";
+import chefImage from "../../../../public/assets/chef.jpg"
 
 export default function Profile(){
     const [cookies, setCookie,removeCookie] = useCookies(['user'as any]);
