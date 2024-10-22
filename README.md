@@ -25,11 +25,17 @@ npm install
 ```
 
 ### 3. Set environment file
+Create a file named "next.config.mjs" and setup as follows:
 
 ```cmd
-API_URL= <URL for backend apis>
-e.g
-API_URL=http://localhost:5000
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    env: {
+        API_URL: <URL for backend apis> //e.g. http://localhost:5000
+      },
+};
+
+export default nextConfig;
 ```
 
 ### 4. Start the project
