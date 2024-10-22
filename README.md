@@ -25,7 +25,7 @@ npm install
 ```
 
 ### 3. Set environment file
-Create a file named "next.config.mjs" and setup as follows:
+Create a file named "next.config.mjs" in the root directory and setup as follows:
 
 ```cmd
 /** @type {import('next').NextConfig} */
