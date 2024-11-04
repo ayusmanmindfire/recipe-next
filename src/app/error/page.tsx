@@ -1,5 +1,6 @@
 //Static imports
-import errorImage from "../../../public/assets/errorImage.jpg"
+import { errorStrings } from "@/utils/constantStrings"
+import { imagePaths } from "@/utils/imageImports"
 
 export default function ErrorPage(){
     return(
@@ -7,11 +8,11 @@ export default function ErrorPage(){
             <div className="h-screen items-center gap-2 bg-[#d7e8f8] p-2 md:flex">
                 {/* Image content */}
                 <div >
-                    <img src={errorImage.src} alt="" className="md:h-screen"/>
+                    <img src={imagePaths.errorImage.src} alt="Error image" className="md:h-screen"/>
                 </div>
                 {/* Specific error message */}
                 <div className="font-Rubik text-5xl text-primary text-center">
-                    Something went wrong
+                    {errorStrings.wentWrong}
                 </div>
             </div>
         </>
