@@ -35,7 +35,7 @@ export default function RecipesPage() {
                         Authorization: `Bearer ${token}`, // Send token in header
                     },
                 });
-                setRecipes(response.data.data);
+                setRecipes(response.data.data.recipes);
             } catch (error: any) {
                 if (error.response && error.response.status === 401)
                     navigate.push('/auth/login')
