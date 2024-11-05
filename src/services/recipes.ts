@@ -35,7 +35,7 @@ export async function getAllRecipe(token:string,page=1,limit:any){
 
 
 //function for calling delete an recipe api
-export async function deleteRecipe(token:string,id:string){
+export async function deleteRecipe(token:string,id:any){
     try {
         await axios.delete(`${recipesApi.deleteRecipes}${id}`, {
             headers: {
@@ -48,7 +48,7 @@ export async function deleteRecipe(token:string,id:string){
 }
 
 //function for calling an api for getting details of an recipe
-export async function getRecipeDetails(token:string,id:string){
+export async function getRecipeDetails(token:string,id:any){
     try {
         const recipeResponse = await axios.get(`${recipesApi.getRecipeDetails}${id}`, {
             headers: {
@@ -77,7 +77,7 @@ export async function addRecipe(token:string,values:any){
 }
 
 //function for calling an api for editing a recipe
-export async function editRecipe(token:string,values:any,id:string){
+export async function editRecipe(token:string,values:any,id:any){
     try {
         const response = await axios.put(`${recipesApi.updateRecipe}${id}`, values, {
             headers: {

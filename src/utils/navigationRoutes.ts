@@ -4,7 +4,7 @@ export const navRoutes={
     recipes: '/recipes',
     login: '/auth/login',
     error: '/error',
-    editRecipe: '/editRecipe/',
+    editRecipe: '/editRecipe',
     addRecipe: '/recipes/addRecipe',
     profile:'/auth/profile'
 }
