@@ -4,12 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 //Third-party imports
-import axios from 'axios';
 import { useFormik } from 'formik';
 import { useCookies } from 'react-cookie';
 
 //Static imports
-import { ratingsApi } from '../utils/apiPaths';
+import { addRating } from '@/services/rating';
+import { navRoutes } from '@/utils/navigationRoutes';
+import { ratingStrings } from '@/utils/constantStrings';
 
 
 // Form validation
@@ -29,16 +30,20 @@ const validate = (values:any) => {
     return errors;
 };
 
-export function RatingModal({ recipeID, handleClose }:any) {
+/**
+ * RatingModal component provides a form for users to submit a rating (1-5) and feedback for a recipe.
+ * It validates inputs and submits them to the backend, redirecting unauthenticated users to login.
+ * Props: recipeID (string), handleClose (function to close the modal).
+ */
+export const RatingModal = ({ recipeID, handleClose }:any) => {
+    //All states
+    const [apiError, setApiError] = useState("");
+
+    //All constants
     const [cookies] = useCookies(["user"] as any);
     const token = cookies.Authorization;
-    const [apiError, setApiError] = useState("")
     const navigate = useRouter();
-    useEffect(() => {
-        if (!token) {
-            navigate.push('/auth/login')
-        }
-    })
+    // Initialize Formik with initial values, validation, and submission logic for handling rating submission
     const formik = useFormik({
         initialValues: {
             rating: null,
@@ -47,29 +52,33 @@ export function RatingModal({ recipeID, handleClose }:any) {
         validate,
         onSubmit: async (values) => {
             try {
-                const response = await axios.post(ratingsApi.addRatings + recipeID, values, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    }
-                })
+                const response = await addRating(token,values,recipeID)
                 handleClose();
 
             } catch (error:any) {
                 if (error.response)
                     setApiError(error.response.data.message);
                 else
-                    navigate.push('/error')
+                    navigate.push(navRoutes.error)
             }
 
         }
     });
 
+    //Use effects
+    //For empty token navigate to login page
+    useEffect(() => {
+        if (!token) {
+            navigate.push(navRoutes.login)
+        }
+    })
+
     return (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 border rounded shadow-lg w-[80%] md:w-[40%]">
-            <h2 className="text-lg font-bold mb-4">Rate this Recipe</h2>
+        <div className="dark:bg-gray-700 dark:text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 border rounded shadow-lg w-[80%] md:w-[40%]">
+            <h2 className="text-lg font-bold mb-4">{ratingStrings.ratingHeader}</h2>
             <form onSubmit={formik.handleSubmit}>
                 <div className="mb-4">
-                    <label className="block text-sm font-medium mb-2">Rating (1-5):</label>
+                    <label className="block text-sm font-medium mb-2">{ratingStrings.ratingField}</label>
                     <input
                         type="number"
                         min="1"
@@ -77,7 +86,7 @@ export function RatingModal({ recipeID, handleClose }:any) {
                         name="rating"
                         value={formik.values.rating as any}
                         onChange={formik.handleChange}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2 border border-gray-300 rounded dark:bg-gray-400"
                     />
                     {/* Error handling */}
                     {formik.errors.rating && (
@@ -86,12 +95,12 @@ export function RatingModal({ recipeID, handleClose }:any) {
                 </div>
 
                 <div className="mb-4">
-                    <label className="block text-sm font-medium mb-2">Feedback:</label>
+                    <label className="block text-sm font-medium mb-2">{ratingStrings.feedback}</label>
                     <textarea
                         name="feedback"
                         value={formik.values.feedback}
                         onChange={formik.handleChange}
-                        className="w-full p-2 border border-gray-300 rounded"
+                        className="w-full p-2 border border-gray-300 rounded dark:bg-gray-400 dark:placeholder-white"
                         rows={4}
                         placeholder="Leave your feedback here"
                     />
@@ -105,14 +114,14 @@ export function RatingModal({ recipeID, handleClose }:any) {
                     type="submit"
                     className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 "
                 >
-                    Submit
+                    {ratingStrings.submitButton}
                 </button>
 
                 <button
                     onClick={handleClose}
                     className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 mx-5"
                 >
-                    Cancel
+                    {ratingStrings.cancelButton}
                 </button>
 
                 {/* API Error Message */}

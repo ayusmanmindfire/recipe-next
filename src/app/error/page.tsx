@@ -2,6 +2,10 @@
 import { errorStrings } from "@/utils/constantStrings"
 import { imagePaths } from "@/utils/imageImports"
 
+/**
+ * Static error page
+ * it returns only an image with a string when it will face some network error
+ */
 export default function ErrorPage(){
     return(
         <>

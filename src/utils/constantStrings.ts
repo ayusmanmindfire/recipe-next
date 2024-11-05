@@ -78,3 +78,7 @@ export const recipeFormStrings={
     removeButton:"Remove",
     addButton:"Add ingredient"
 }
+
+export const LoaderStrings={
+    loading:"Loading..."
+}

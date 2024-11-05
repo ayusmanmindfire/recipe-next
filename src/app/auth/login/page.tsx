@@ -6,10 +6,13 @@ import { useState } from "react";
 //Third party import
 import { useCookies } from "react-cookie";
 import { useFormik } from "formik";
-import axios from "axios";
+import { useDispatch } from "react-redux";
 
 //Static imports
-import { userApi } from "../../../utils/apiPaths";
+import { loginStrings } from "@/utils/constantStrings";
+import { navRoutes } from "@/utils/navigationRoutes";
+import { userLogin, verifyToken } from "@/services/auth";
+import { setUserDetails } from "@/redux/userSlice";
 
 
 //formik validation function
@@ -30,10 +33,18 @@ const validate=(values:any)=>{
     return errors;
 }
 
+/** Login component for handling user authentication
+* Renders a form for users to enter their email and password
+* Manages form submission, API interaction, and navigation on successful login*/
 export default function Login(){
-    const [apiError,setApiError]=useState("");
-    const [cookies, setCookie] = useCookies(['user']) as any;
-    const navigate=useRouter();
+     //All states
+     const [apiError,setApiError]=useState("");
+
+     //All constants
+     const [cookies, setCookie] = useCookies(['user']) as any;
+     const navigate=useRouter();
+     const dispatch=useDispatch();
+     // Interaction with form using formik
     const formik=useFormik({
         initialValues:{
             email:"",
@@ -42,16 +53,17 @@ export default function Login(){
         validate,
         onSubmit:async(values)=>{
             try {
-                // console.log(values)
-                const response=await axios.post(userApi.loginUser,values,{
-                    headers:{
-                        "Content-Type":"Application/json"
-                    }
-                })
-                console.log(response.data)
-                await setCookie("Authorization",response.data.data)
+                const response=await userLogin(values)
+                const token=response.data.data;
+                setCookie("Authorization",token)
                 setApiError("");
-                navigate.push('/recipes');
+
+                //Storing user details to the redux                 
+                const userResponse = await verifyToken(token);
+                dispatch(setUserDetails(userResponse.data.data));
+                
+                //Navigate to the all recipes page
+                navigate.push(navRoutes.recipes);
             } catch (error:any) {
                 if(error.response)
                     setApiError(error.response.data.message||"Something went wrong")
@@ -62,20 +74,20 @@ export default function Login(){
     })
     return(
         <>
-            <div className="section-container grid grid-cols-1 items-center gap-10 md:h-screen md:grid-cols-2 p-10 font-Rubik bg-gray-100 ">
+            <div className="dark:bg-gray-600 dark:h-screen section-container grid grid-cols-1 items-center gap-10 md:h-screen md:grid-cols-2 p-10 font-Rubik bg-gray-100 ">
                  {/*Signup option */}
                  <div className="flex flex-col items-center justify-center space-y-4">
-                    <p className="text-lg">Do not have an account?</p>
+                    <p className="text-lg dark:text-white">{loginStrings.noAccount}</p>
                     <button
                         className="bg-primary hover:bg-hoverPrimary text-white py-3 px-6 rounded-lg font-semibold"
-                        onClick={() => navigate.push('/auth/signup')}
+                        onClick={() => navigate.push(navRoutes.signup)}
                     >
-                        Sign UP
+                        {loginStrings.signUpButton}
                     </button>
                 </div>
                 {/* Form Container */}
-                <div className="form-container w-full bg-white p-8 rounded-lg shadow-lg">
-                    <h2 className="text-2xl font-semibold mb-6 text-center">Log-in to your Account</h2>
+                <div className="form-container w-full bg-white p-8 rounded-lg shadow-lg dark:bg-gray-800">
+                    <h2 className=" dark:text-white text-2xl font-semibold mb-6 text-center">{loginStrings.LoginHeader}</h2>
                     <form onSubmit={formik.handleSubmit} className="space-y-4">
                         
                         <div>
@@ -110,7 +122,7 @@ export default function Login(){
                         <button
                             type="submit"
                             className="w-full bg-primary hover:bg-hoverPrimary text-white py-3 rounded-lg font-semibold">
-                            Log in
+                            {loginStrings.LoginButton}
                         </button>
 
                         {/* API Error Message */}

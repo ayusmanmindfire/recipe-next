@@ -4,51 +4,61 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 //Third party imports
-import axios from "axios";
 import { useCookies } from "react-cookie";
 
 //Static imports
 import { RecipeForm } from "../../../components/RecipeForm";
-import { recipesApi } from "../../../utils/apiPaths";
-import eggCooking from "../../../../public/assets/eggCooking.jpg";
+import { imagePaths } from "@/utils/imageImports";
+import { addRecipeStrings } from "@/utils/constantStrings";
+import { navRoutes } from "@/utils/navigationRoutes";
+import { addRecipe } from "@/services/recipes";
 
+/* 
+ * AddRecipePage component for creating a new recipe using RecipeForm component
+ * Validates user authorization, provides a form for recipe details, and handles submission to the API
+ * On successful submission, redirects to the recipes page
+ */
 export default function AddRecipePag() {
+    //All states
     const [apiError, setApiError] = useState("");
+
+    //All constants
     const navigate = useRouter();
     const [cookies] = useCookies(["user"] as any);
     const token = cookies.Authorization;
-
     const initialValues = {
         title: "",
         steps: "",
         image: "",
         ingredients: [""],
     };
-    useEffect(()=>{
-        if(!token)
-            navigate.push('/auth/login')
-    },[])
 
+    //Utility functions
+    //Function for handling form submission
     const handleSubmit = async (values:any) => {
         try {
-            const response = await axios.post(recipesApi.addNewRecipe, values, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            const response = await addRecipe(token,values)
             setApiError("");
-            navigate.push("/recipes");
+            navigate.push(navRoutes.recipes);
         } catch (error:any) {
             setApiError(error.response?.data?.message || "Something went wrong");
         }
     };
 
+    //Use effects
+    //For empty token navigate to login page
+    useEffect(()=>{
+        if(!token)
+            navigate.push(navRoutes.login)
+    },[])
+
     return (
         <>
+            <div className="min-h-screen dark:bg-gray-800 dark:text-white h-full dark:h-screen">
             <div className="container mx-auto py-5">
-                <h2 className="text-2xl font-bold text-center font-Rubik">Add New Recipe</h2>
-                <RecipeForm initialValues={initialValues} onSubmit={handleSubmit} apiError={apiError} imageSection={eggCooking.src} />
+                <h2 className="text-2xl font-bold text-center font-Rubik">{addRecipeStrings.addRecipe}</h2>
+                <RecipeForm initialValues={initialValues} onSubmit={handleSubmit} apiError={apiError} imageSection={imagePaths.eggCooking.src} />
+            </div>
             </div>
         </>
     );

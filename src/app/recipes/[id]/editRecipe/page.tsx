@@ -4,15 +4,22 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 //Third party imports
-import axios from "axios";
 import { useCookies } from "react-cookie";
 
 //Static imports
 import { RecipeForm } from "../../../../components/RecipeForm";
-import { recipesApi } from "../../../../utils/apiPaths";
-import smokeImage from "../../../../../public/assets/smoke.jpg";
+import { editRecipe, getRecipeDetails } from "@/services/recipes";
+import { navRoutes } from "@/utils/navigationRoutes";
+import { imagePaths } from "@/utils/imageImports";
+import { editRecipeStrings } from "@/utils/constantStrings";
 
+/*
+ * EditRecipePage component for editing an existing recipe using recipeForm component
+ * Retrieves recipe details based on recipe ID, pre-populates form with existing data, and handles updates to the API
+ * On successful edit, redirects to the recipes page
+ */
 export default function EditRecipePage() {
+    //All states
     const [apiError, setApiError] = useState("");
     const [initialValues, setInitialValues] = useState({
         title: "",
@@ -20,24 +27,37 @@ export default function EditRecipePage() {
         image: "",
         ingredients: [""],
     });
+
+    //All constants
     const { id } = useParams();
     const navigate = useRouter();
     const [cookies] = useCookies(["user"] as any);
     const token = cookies.Authorization;
 
+    //Utility functions
+    //Function to handle submission of form
+    const handleSubmit = async (values:any) => {
+        try {
+            const response = await editRecipe(token,values,id)
+            setApiError("");
+            navigate.push(navRoutes.recipes);
+        } catch (error:any) {
+            setApiError(error.response?.data?.message || "Something went wrong");
+        }
+    };
+
+    //Use effects
     useEffect(() => {
         const fetchRecipeDetails = async () => {
             try {
-                if(!token){
-                    navigate.push('/auth/login');
+                //For empty token redirect to login page
+                if (!token) {
+                    navigate.push(navRoutes.login);
                     return
                 }
-                const response = await axios.get(`${recipesApi.getRecipeDetails}${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await getRecipeDetails(token,id)
                 const recipeData = response.data.data;
+                //Re-populate input fields
                 setInitialValues({
                     title: recipeData.title,
                     steps: recipeData.steps,
@@ -52,26 +72,13 @@ export default function EditRecipePage() {
         fetchRecipeDetails();
     }, [id, token]);
 
-    const handleSubmit = async (values: any) => {
-        try {
-            const response = await axios.put(`${recipesApi.updateRecipe}${id}`, values, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            setApiError("");
-            navigate.push("/recipes");
-        } catch (error: any) {
-            setApiError(error.response?.data?.message || "Something went wrong");
-        }
-    };
-
     return (
         <>
-            <div className="container mx-auto p-8">
-                <h2 className="text-2xl font-bold text-center font-Rubik mb-6">Edit Recipe</h2>
-                <RecipeForm initialValues={initialValues} onSubmit={handleSubmit} apiError={apiError} imageSection={smokeImage.src}/>
+            <div className="dark:bg-gray-800 dark:text-white min-h-screen">
+                <div className="container mx-auto p-8 ">
+                    <h2 className="text-2xl font-bold text-center font-Rubik mb-6">{editRecipeStrings.editRecipe}</h2>
+                    <RecipeForm initialValues={initialValues} onSubmit={handleSubmit} apiError={apiError} imageSection={imagePaths.smoke.src} />
+                </div>
             </div>
         </>
     );
