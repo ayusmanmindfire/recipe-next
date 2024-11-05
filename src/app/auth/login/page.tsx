@@ -6,12 +6,13 @@ import { useState } from "react";
 //Third party import
 import { useCookies } from "react-cookie";
 import { useFormik } from "formik";
-import axios from "axios";
+import { useDispatch } from "react-redux";
 
 //Static imports
-import { userApi } from "../../../utils/apiPaths";
 import { loginStrings } from "@/utils/constantStrings";
 import { navRoutes } from "@/utils/navigationRoutes";
+import { userLogin, verifyToken } from "@/services/auth";
+import { setUserDetails } from "@/redux/userSlice";
 
 
 //formik validation function
@@ -36,9 +37,14 @@ const validate=(values:any)=>{
 * Renders a form for users to enter their email and password
 * Manages form submission, API interaction, and navigation on successful login*/
 export default function Login(){
-    const [apiError,setApiError]=useState("");
-    const [cookies, setCookie] = useCookies(['user']) as any;
-    const navigate=useRouter();
+     //All states
+     const [apiError,setApiError]=useState("");
+
+     //All constants
+     const [cookies, setCookie] = useCookies(['user']) as any;
+     const navigate=useRouter();
+     const dispatch=useDispatch();
+     // Interaction with form using formik
     const formik=useFormik({
         initialValues:{
             email:"",
@@ -47,16 +53,17 @@ export default function Login(){
         validate,
         onSubmit:async(values)=>{
             try {
-                // console.log(values)
-                const response=await axios.post(userApi.loginUser,values,{
-                    headers:{
-                        "Content-Type":"Application/json"
-                    }
-                })
-                console.log(response.data)
-                await setCookie("Authorization",response.data.data)
+                const response=await userLogin(values)
+                const token=response.data.data;
+                setCookie("Authorization",token)
                 setApiError("");
-                navigate.push('/recipes');
+
+                //Storing user details to the redux                 
+                const userResponse = await verifyToken(token);
+                dispatch(setUserDetails(userResponse.data.data));
+                
+                //Navigate to the all recipes page
+                navigate.push(navRoutes.recipes);
             } catch (error:any) {
                 if(error.response)
                     setApiError(error.response.data.message||"Something went wrong")
