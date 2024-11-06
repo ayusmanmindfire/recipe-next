@@ -72,7 +72,7 @@ export default nextConfig;
 npm run dev
 ```
 
-### 4. To start project in production environment
+### 5. To start project in production environment
 Build the project
 ```cmd
 npm run build
