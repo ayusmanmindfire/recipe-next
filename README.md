@@ -73,12 +73,16 @@ npm run dev
 ```
 
 ### 5. To start project in production environment
-Build the project
+First build the project
 ```cmd
 npm run build
 ```
-Run the project
+Then run the project
 ```cmd
 npm start
 ```
+### 6. To run unit testing of the project
 
+```cmd
+npm test
+```
