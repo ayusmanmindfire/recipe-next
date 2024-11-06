@@ -5,7 +5,7 @@ import axios from "axios";
 import { userApi } from "../utils/apiPaths";
 
 // Api call for user login
-export async function userLogin(values){
+export async function userLogin(values:any){
     try {
         const response=await axios.post(userApi.loginUser,values,{
             headers:{
@@ -19,7 +19,7 @@ export async function userLogin(values){
 }
 
 //Api call for fetching user details by decoding token
-export async function verifyToken(token){
+export async function verifyToken(token:string){
     try {
         const userResponse = await axios.get(userApi.verifyTokenUser, {
             headers: {
@@ -33,7 +33,7 @@ export async function verifyToken(token){
 }
 
 // Api call registering a new user
-export async function registerUser(values){
+export async function registerUser(values:any){
     try {
         const response = await axios.post(userApi.registerUser, values, {
             headers: {

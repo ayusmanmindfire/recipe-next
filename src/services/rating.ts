@@ -5,7 +5,7 @@ import axios from "axios";
 import { ratingsApi } from "../utils/apiPaths";
 
 //function for api call that fetch all ratings of a single recipe
-export async function getRatingsOfARecipe(token,id){
+export async function getRatingsOfARecipe(token:string,id:any){
     try {
         const ratingResponse = await axios.get(`${ratingsApi.getRatings}${id}`, {
             headers: {
@@ -19,7 +19,7 @@ export async function getRatingsOfARecipe(token,id){
 }
 
 //function for api call that add ratings to a single recipe
-export async function addRating(token,values,recipeID){
+export async function addRating(token:string,values:any,recipeID:any){
     try {
         const response = await axios.post(ratingsApi.addRatings + recipeID, values, {
             headers: {
