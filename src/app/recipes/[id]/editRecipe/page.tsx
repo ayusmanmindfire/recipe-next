@@ -12,6 +12,7 @@ import { editRecipe, getRecipeDetails } from "@/services/recipes";
 import { navRoutes } from "@/utils/navigationRoutes";
 import { imagePaths } from "@/utils/imageImports";
 import { editRecipeStrings } from "@/utils/constantStrings";
+import { useSelector } from "react-redux";
 
 /*
  * EditRecipePage component for editing an existing recipe using recipeForm component
@@ -29,6 +30,8 @@ export default function EditRecipePage() {
     });
 
     //All constants
+    //Fetching user details from the redux store
+    const userResponse= useSelector((state:any) => state.user.userDetails);
     const { id } = useParams();
     const navigate = useRouter();
     const [cookies] = useCookies(["user"] as any);
@@ -64,6 +67,9 @@ export default function EditRecipePage() {
                     image: recipeData.image,
                     ingredients: recipeData.ingredients,
                 });
+                //Preventing unauthorized user for editing a recipe
+                if(userResponse.email!=recipeData.createdBy)
+                    navigate.push(navRoutes.error)
             } catch (error) {
                 setApiError("Error fetching recipe details");
             }
